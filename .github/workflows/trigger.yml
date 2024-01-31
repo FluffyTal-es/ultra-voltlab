@@ -1,0 +1,28 @@
+name: "trigger deployment"
+
+on:
+  push:
+    branches:    
+      - 'main'
+      - 'develop'
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.DEPLOY_TOKEN }}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: 'FluffyTal-es',
+              repo: 'fluffy-deploy',
+              workflow_id: 23184135,
+              ref: 'main',
+              inputs: {
+                repo: '${{ github.event.repository.name }}',
+                live: '${{ github.ref_name }}' === 'main' ? 'yes' : 'no',
+                sha: '${{ github.sha }}',
+                actor: '${{ github.actor }}'
+              }
+            })
